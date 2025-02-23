@@ -12,31 +12,43 @@ def extract_video_id(youtube_url):
 def fetch_video_clip(request):
     """API to fetch video clip status (simulated for now)"""
     url = request.GET.get("url", "")
-    video_id = extract_video_id(url)
+    
+    # If no URL is provided in the request, return an error response
+    if not url:
+        return JsonResponse({"error": "No URL provided"}, status=400)
 
+    video_id = extract_video_id(url)
+    
+    # If video ID extraction fails, return an error response
     if not video_id:
         return JsonResponse({"error": "Invalid YouTube URL"}, status=400)
 
-    # For the sake of simulation, we are assuming the video clipping process here
     try:
-        # Simulating the video clipping process (replace with your clipping logic)
-        # Here you could integrate actual video clipping logic
+        # Simulate the video clipping process (replace with actual clipping logic in the future)
         clipped_video_url = f"https://www.youtube.com/watch?v={video_id}"
         thumbnail_url = f"https://img.youtube.com/vi/{video_id}/hqdefault.jpg"
 
+        # Return the JSON response with video details
         return JsonResponse({
             "video_id": video_id,
             "clipped_video_url": clipped_video_url,
             "thumbnail": thumbnail_url
         })
     except Exception as e:
-        return JsonResponse({"error": str(e)}, status=500)
+        # If an error occurs, return an error response with the exception message
+        return JsonResponse({"error": f"An error occurred: {str(e)}"}, status=500)
 
 def home(request):
     """Renders the homepage"""
-    return render(request, "index.html")  # This should be your main home page template
+    return render(request, "index.html")  # This renders the index.html file
 
 def process_clip(request):
     """Renders the clip processing page with the video URL"""
     video_url = request.GET.get("url", "")
+    
+    if not video_url:
+        # If no video URL is provided, show an error message on the process_clip page
+        return render(request, "process_clip.html", {"error": "No video URL provided"})
+    
+    # If the video URL is valid, proceed with rendering the page and passing the video URL to the template
     return render(request, "process_clip.html", {"video_url": video_url})
